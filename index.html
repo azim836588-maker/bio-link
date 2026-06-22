@@ -26,6 +26,7 @@
             transition: background-image 0.5s ease;
         }
 
+        /* ===== LOADER ===== */
         #loader-wrapper {
             position: fixed;
             top: 0;
@@ -45,12 +46,12 @@
             width: 50%;
             height: 100%;
             background-color: #1a1a1a;
-            transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1);
             z-index: 1001;
         }
 
-        .door-left { left: 0; border-right: 1px solid #333; }
-        .door-right { right: 0; border-left: 1px solid #333; }
+        .door-left  { left: 0;  border-right: 1px solid #333; }
+        .door-right { right: 0; border-left:  1px solid #333; }
 
         .welcome-text {
             position: absolute;
@@ -60,9 +61,9 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 5px;
-            opacity: 1;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
             text-align: center;
+            pointer-events: none;
         }
 
         .welcome-text span {
@@ -80,7 +81,6 @@
             display: inline-block;
             animation: dots 1.5s steps(4, end) infinite;
         }
-
         @keyframes dots {
             0%   { content: ''; }
             25%  { content: '.'; }
@@ -89,11 +89,16 @@
             100% { content: ''; }
         }
 
-        .loaded .door-left { transform: translateX(-100%); }
-        .loaded .door-right { transform: translateX(100%); }
+        /* Opened state */
+        .loaded .door-left  { transform: translateX(-100%); }
+        .loaded .door-right { transform: translateX(100%);  }
         .loaded .welcome-text { opacity: 0; }
-        .loaded#loader-wrapper { visibility: hidden; transition: visibility 0.8s; }
+        .loaded#loader-wrapper {
+            visibility: hidden;
+            transition: visibility 0s 0.75s;
+        }
 
+        /* ===== CARD ===== */
         .card {
             width: 100%;
             max-width: 400px;
@@ -110,6 +115,7 @@
         }
         .card::-webkit-scrollbar { display: none; }
 
+        /* ===== BANNER ===== */
         .banner {
             width: 100%;
             min-height: 180px;
@@ -119,6 +125,18 @@
             overflow: hidden;
             flex-shrink: 0;
             background-color: #ddd;
+            transition: background-image 0.4s ease;
+        }
+
+        /* Skeleton shimmer on banner while image loads */
+        .banner.loading {
+            background: linear-gradient(90deg, #d0d0d0 25%, #e8e8e8 50%, #d0d0d0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .banner::after {
@@ -128,18 +146,21 @@
             left: -150%;
             width: 50%;
             height: 100%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            background: linear-gradient(to right,
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.4) 50%,
+                rgba(255,255,255,0) 100%);
             transform: skewX(-25deg);
             animation: shine-banner 10s infinite;
             pointer-events: none;
         }
-
         @keyframes shine-banner {
-            0% { left: -150%; }
-            20% { left: 150%; }
+            0%   { left: -150%; }
+            20%  { left: 150%; }
             100% { left: 150%; }
         }
 
+        /* ===== PROFILE PIC ===== */
         .profile-container {
             margin-top: -60px;
             z-index: 5;
@@ -159,12 +180,23 @@
             position: relative;
         }
 
+        /* Skeleton shimmer on profile pic */
+        .profile-pic.loading {
+            background: linear-gradient(90deg, #d0d0d0 25%, #e8e8e8 50%, #d0d0d0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+
         .profile-pic img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
+        .profile-pic img.visible { opacity: 1; }
 
+        /* ===== INFO ===== */
         .info {
             text-align: center;
             padding: 15px;
@@ -186,6 +218,7 @@
             margin: 0 auto;
         }
 
+        /* ===== SAVE BUTTON ===== */
         .save-btn {
             background-color: #0056ff;
             color: white;
@@ -201,6 +234,7 @@
             display: block;
         }
 
+        /* ===== ICON GRID ===== */
         .icon-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -234,15 +268,15 @@
             font-weight: 600;
         }
 
-        .fb-bg { background-color: #1877F2; }
-        .ig-bg { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
-        .tk-bg { background-color: #000000; }
-        .yt-bg { background-color: #FF0000; }
-        .wa-bg { background-color: #25D366; }
-        .ms-bg { background-color: #0084FF; }
-        .tg-bg { background-color: #26A5E4; }
-        .x-bg  { background-color: #000000; }
-        .li-bg { background-color: #0077B5; }
+        .fb-bg   { background-color: #1877F2; }
+        .ig-bg   { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .tk-bg   { background-color: #000000; }
+        .yt-bg   { background-color: #FF0000; }
+        .wa-bg   { background-color: #25D366; }
+        .ms-bg   { background-color: #0084FF; }
+        .tg-bg   { background-color: #26A5E4; }
+        .x-bg    { background-color: #000000; }
+        .li-bg   { background-color: #0077B5; }
         .mail-bg { background-color: #EA4335; }
 
         .extra-space { height: 40px; width: 100%; }
@@ -260,12 +294,10 @@
     </div>
 
     <div class="card" id="businessCard">
-        <div class="banner" id="bannerImage"></div>
+        <div class="banner loading" id="bannerImage"></div>
 
         <div class="profile-container">
-            <div class="profile-pic" id="profilePic">
-                <span class="placeholder">...</span>
-            </div>
+            <div class="profile-pic loading" id="profilePic"></div>
         </div>
 
         <div class="info">
@@ -300,13 +332,13 @@
         ];
 
         const firebaseConfig = {
-          apiKey: "AIzaSyA2VRs8vok_FuwOkhA0vFJA3NU8Rq-te2M",
-          authDomain: "pro2-270e8.firebaseapp.com",
-          projectId: "pro2-270e8",
-          storageBucket: "pro2-270e8.firebasestorage.app",
-          messagingSenderId: "497934747508",
-          appId: "1:497934747508:web:d689174366df6236fa8e21",
-          measurementId: "G-ZMC62EF10E"
+            apiKey: "AIzaSyA2VRs8vok_FuwOkhA0vFJA3NU8Rq-te2M",
+            authDomain: "pro2-270e8.firebaseapp.com",
+            projectId: "pro2-270e8",
+            storageBucket: "pro2-270e8.firebasestorage.app",
+            messagingSenderId: "497934747508",
+            appId: "1:497934747508:web:d689174366df6236fa8e21",
+            measurementId: "G-ZMC62EF10E"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -316,28 +348,62 @@
         auth.signInAnonymously().catch(e => console.error("Auth error:", e));
 
         let profileDone = false;
-        let linksDone = false;
-        let isOpened = false;
+        let linksDone   = false;
+        let isOpened    = false;
 
+        /* ── দরজা খোলার ফাংশন ─────────────────────────────────────
+           ছবির জন্য অপেক্ষা নেই — টেক্সট ও লিংক ডেটা রেডি হলেই খুলবে */
         function openDoors() {
             if (profileDone && linksDone && !isOpened) {
                 isOpened = true;
-                setTimeout(() => {
-                    document.getElementById('loader-wrapper').classList.add('loaded');
-                }, 600);
+
+                // "Ready!" দেখাও
+                const msg = document.getElementById('load-msg');
+                msg.classList.remove('dots-anim');
+                msg.textContent = 'Ready!';
+
+                // সাথে সাথে দরজা খোলো (কোনো setTimeout নেই)
+                document.getElementById('loader-wrapper').classList.add('loaded');
             }
         }
 
-        function preloadImage(url) {
-            return new Promise((resolve) => {
-                if (!url) resolve();
-                const img = new Image();
-                img.src = url;
-                img.onload = resolve;
-                img.onerror = resolve;
-            });
+        /* ── ছবি ফেড-ইন লোডার ─────────────────────────────────────
+           দরজা খোলার পর ব্যাকগ্রাউন্ডে ছবি লোড হয়,
+           লোড হলে shimmer সরে যায় এবং ছবি ফেড-ইন করে দেখায় */
+        function loadBannerImage(url) {
+            if (!url) return;
+            const banner = document.getElementById('bannerImage');
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                banner.style.backgroundImage = `url('${url}')`;
+                banner.classList.remove('loading');
+            };
         }
 
+        function loadProfileImage(url) {
+            if (!url) return;
+            const picEl = document.getElementById('profilePic');
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                picEl.classList.remove('loading');
+                img.className = 'visible';
+                picEl.innerHTML = '';
+                picEl.appendChild(img);
+            };
+        }
+
+        function loadBgImage(url) {
+            if (!url) return;
+            const img = new Image();
+            img.src = url;
+            img.onload = () => {
+                document.body.style.backgroundImage = `url('${url}')`;
+            };
+        }
+
+        /* ── URL নির্মাণ ──────────────────────────────────────────── */
         function buildHref(link, val) {
             if (!val || val === '#') return '#';
 
@@ -345,26 +411,24 @@
                 if (val.startsWith('http')) return val;
                 return `https://wa.me/${val.replace(/[^0-9]/g, '')}`;
             }
-
             if (link.id === 'tg') {
                 if (val.startsWith('http')) return val;
-                if (val.startsWith('+') || /^\d/.test(val)) return `https://t.me/${val.replace(/[^0-9+]/g, '')}`;
+                if (val.startsWith('+') || /^\d/.test(val))
+                    return `https://t.me/${val.replace(/[^0-9+]/g, '')}`;
                 return `https://t.me/${val.replace('@', '')}`;
             }
-
             if (link.id === 'tt') {
                 if (val.startsWith('http')) return val;
                 return `https://www.tiktok.com/@${val.replace('@', '')}`;
             }
-
             if (link.id === 'mail') {
                 if (val.startsWith('mailto:') || val.startsWith('http')) return val;
                 return `mailto:${val}`;
             }
-
             return val.startsWith('http') ? val : '#';
         }
 
+        /* ── Analytics ────────────────────────────────────────────── */
         function recordClick(label, type) {
             const device = /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
             const clickData = { label, type, device, time: Date.now() };
@@ -375,75 +439,64 @@
             }).catch(e => console.error("Analytics error:", e));
         }
 
+        /* ── Firebase Realtime Listeners ──────────────────────────── */
         function listenToCardData() {
-            db.collection('card_data').doc('profile').onSnapshot(async (doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById('displayName').textContent = data.name || 'Your Name';
-                    document.getElementById('displayBio').textContent = data.bio || '';
 
-                    const saveBtn = document.getElementById('saveBtn');
-                    saveBtn.textContent = data.save_text || 'Save Contact';
-                    if (data.phone) {
-                        saveBtn.href = `tel:${data.phone.replace(/\s/g, '')}`;
-                    }
-                    saveBtn.onclick = function() {
-                        recordClick('Save Contact', 'save_btn');
-                    };
+            // ─── Profile ───────────────────────────────────────────
+            db.collection('card_data').doc('profile').onSnapshot(doc => {
+                if (!doc.exists) return;
+                const data = doc.data();
 
-                    const imgPromises = [];
-                    if (data.profile_img) {
-                        imgPromises.push(preloadImage(data.profile_img).then(() => {
-                            document.getElementById('profilePic').innerHTML = `<img src="${data.profile_img}">`;
-                        }));
-                    }
-                    if (data.banner_img) {
-                        imgPromises.push(preloadImage(data.banner_img).then(() => {
-                            document.getElementById('bannerImage').style.backgroundImage = `url('${data.banner_img}')`;
-                        }));
-                    }
-                    if (data.bg) {
-                        imgPromises.push(preloadImage(data.bg).then(() => {
-                            document.body.style.backgroundImage = `url('${data.bg}')`;
-                        }));
-                    }
+                // টেক্সট ও UI আপডেট — কোনো await নেই
+                document.getElementById('displayName').textContent = data.name || 'Your Name';
+                document.getElementById('displayBio').textContent  = data.bio  || '';
 
-                    await Promise.all(imgPromises);
-                    profileDone = true;
-
-                    // Stop dots animation, show Ready
-                    const msg = document.getElementById('load-msg');
-                    msg.classList.remove('dots-anim');
-                    msg.textContent = "Ready!";
-
-                    openDoors();
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.textContent = data.save_text || 'Save Contact';
+                if (data.phone) {
+                    saveBtn.href = `tel:${data.phone.replace(/\s/g, '')}`;
                 }
+                saveBtn.onclick = () => recordClick('Save Contact', 'save_btn');
+
+                // ✅ টেক্সট রেডি → profileDone সেট → দরজা চেক
+                profileDone = true;
+                openDoors();
+
+                // ছবি ব্যাকগ্রাউন্ডে লোড হবে (দরজার সাথে সম্পর্ক নেই)
+                loadProfileImage(data.profile_img);
+                loadBannerImage(data.banner_img);
+                loadBgImage(data.bg);
             });
 
-            db.collection('card_data').doc('links').onSnapshot((doc) => {
+            // ─── Links ─────────────────────────────────────────────
+            db.collection('card_data').doc('links').onSnapshot(doc => {
                 const linksData = doc.exists ? doc.data() : {};
                 const grid = document.getElementById('iconGrid');
                 grid.innerHTML = '';
 
                 SOCIAL_LINKS.forEach(link => {
-                    const val = linksData[`link_${link.id}_url`] || linksData[`link_${link.id}_user`] || linksData[`link_${link.id}`];
+                    const val = linksData[`link_${link.id}_url`]
+                             || linksData[`link_${link.id}_user`]
+                             || linksData[`link_${link.id}`];
                     const status = linksData[`status_${link.id}`];
 
                     if (status === true && val && val !== '#') {
                         const item = document.createElement('a');
                         item.className = 'icon-item';
-                        item.href = buildHref(link, val);
-                        item.target = '_blank';
+                        item.href      = buildHref(link, val);
+                        item.target    = '_blank';
                         item.innerHTML = `
-                            <div class="icon-box ${link.bgClass}"><i class="${link.icon}"></i></div>
-                            <div class="icon-label">${link.label}</div>
-                        `;
-                        item.addEventListener('click', function() {
-                            recordClick(link.label, 'social_link');
-                        });
+                            <div class="icon-box ${link.bgClass}">
+                                <i class="${link.icon}"></i>
+                            </div>
+                            <div class="icon-label">${link.label}</div>`;
+                        item.addEventListener('click', () =>
+                            recordClick(link.label, 'social_link'));
                         grid.appendChild(item);
                     }
                 });
+
+                // ✅ লিংক রেডি → linksDone সেট → দরজা চেক
                 linksDone = true;
                 openDoors();
             });
