@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Business Card</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease;
+        }
+
+        #loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .door {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #1a1a1a;
+            transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            z-index: 1001;
+        }
+
+        .door-left { left: 0; border-right: 1px solid #333; }
+        .door-right { right: 0; border-left: 1px solid #333; }
+
+        .welcome-text {
+            position: absolute;
+            z-index: 1002;
+            color: #fff;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+            text-align: center;
+        }
+
+        .welcome-text span {
+            display: block;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin-top: 10px;
+            color: #aaa;
+        }
+
+        /* Animated dots */
+        .dots-anim::after {
+            content: '';
+            display: inline-block;
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%   { content: ''; }
+            25%  { content: '.'; }
+            50%  { content: '..'; }
+            75%  { content: '...'; }
+            100% { content: ''; }
+        }
+
+        .loaded .door-left { transform: translateX(-100%); }
+        .loaded .door-right { transform: translateX(100%); }
+        .loaded .welcome-text { opacity: 0; }
+        .loaded#loader-wrapper { visibility: hidden; transition: visibility 0.8s; }
+
+        .card {
+            width: 100%;
+            max-width: 400px;
+            background-color: #e3e9ff;
+            min-height: 100vh;
+            position: relative;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            scrollbar-width: none;
+            padding-bottom: 60px;
+        }
+        .card::-webkit-scrollbar { display: none; }
+
+        .banner {
+            width: 100%;
+            min-height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            background-color: #ddd;
+        }
+
+        .banner::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-25deg);
+            animation: shine-banner 10s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine-banner {
+            0% { left: -150%; }
+            20% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        .profile-container {
+            margin-top: -60px;
+            z-index: 5;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 5px solid #e3e9ff;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info {
+            text-align: center;
+            padding: 15px;
+            width: 100%;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .description {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.4;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .save-btn {
+            background-color: #0056ff;
+            color: white;
+            padding: 12px 0;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0 20px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 86, 255, 0.3);
+            display: block;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 90%;
+            padding-bottom: 20px;
+        }
+
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 26px;
+            margin-bottom: 6px;
+        }
+
+        .icon-label {
+            font-size: 11px;
+            color: #444;
+            font-weight: 600;
+        }
+
+        .fb-bg { background-color: #1877F2; }
+        .ig-bg { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .tk-bg { background-color: #000000; }
+        .yt-bg { background-color: #FF0000; }
+        .wa-bg { background-color: #25D366; }
+        .ms-bg { background-color: #0084FF; }
+        .tg-bg { background-color: #26A5E4; }
+        .x-bg  { background-color: #000000; }
+        .li-bg { background-color: #0077B5; }
+        .mail-bg { background-color: #EA4335; }
+
+        .extra-space { height: 40px; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="loader-wrapper">
+        <div class="door door-left"></div>
+        <div class="welcome-text">
+            WELCOME
+            <span id="load-msg" class="dots-anim">Loading Data</span>
+        </div>
+        <div class="door door-right"></div>
+    </div>
+
+    <div class="card" id="businessCard">
+        <div class="banner" id="bannerImage"></div>
+
+        <div class="profile-container">
+            <div class="profile-pic" id="profilePic">
+                <span class="placeholder">...</span>
+            </div>
+        </div>
+
+        <div class="info">
+            <div class="name" id="displayName">...</div>
+            <div class="description" id="displayBio">...</div>
+        </div>
+
+        <a href="#" class="save-btn" id="saveBtn">Save Contact</a>
+
+        <div class="icon-grid" id="iconGrid"></div>
+
+        <div class="extra-space"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+    <script>
+        const SOCIAL_LINKS = [
+            { id: 'fb-p',    label: 'FB Profile', icon: 'fa-brands fa-facebook-f',         bgClass: 'fb-bg'   },
+            { id: 'fb-page', label: 'FB Page',     icon: 'fa-solid fa-flag',                bgClass: 'fb-bg'   },
+            { id: 'ig',      label: 'Instagram',   icon: 'fa-brands fa-instagram',          bgClass: 'ig-bg'   },
+            { id: 'tt',      label: 'TikTok',      icon: 'fa-brands fa-tiktok',             bgClass: 'tk-bg'   },
+            { id: 'yt',      label: 'YouTube',     icon: 'fa-brands fa-youtube',            bgClass: 'yt-bg'   },
+            { id: 'wa',      label: 'WhatsApp',    icon: 'fa-brands fa-whatsapp',           bgClass: 'wa-bg'   },
+            { id: 'msn',     label: 'Messenger',   icon: 'fa-brands fa-facebook-messenger', bgClass: 'ms-bg'   },
+            { id: 'tg',      label: 'Telegram',    icon: 'fa-brands fa-telegram',           bgClass: 'tg-bg'   },
+            { id: 'x',       label: 'X',           icon: 'fa-solid fa-x',                   bgClass: 'x-bg'    },
+            { id: 'li',      label: 'LinkedIn',    icon: 'fa-brands fa-linkedin-in',        bgClass: 'li-bg'   },
+            { id: 'mail',    label: 'Email',       icon: 'fa-regular fa-envelope',          bgClass: 'mail-bg' }
+        ];
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyA2VRs8vok_FuwOkhA0vFJA3NU8Rq-te2M",
+          authDomain: "pro2-270e8.firebaseapp.com",
+          projectId: "pro2-270e8",
+          storageBucket: "pro2-270e8.firebasestorage.app",
+          messagingSenderId: "497934747508",
+          appId: "1:497934747508:web:d689174366df6236fa8e21",
+          measurementId: "G-ZMC62EF10E"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        auth.signInAnonymously().catch(e => console.error("Auth error:", e));
+
+        let profileDone = false;
+        let linksDone = false;
+        let isOpened = false;
+
+        function openDoors() {
+            if (profileDone && linksDone && !isOpened) {
+                isOpened = true;
+                setTimeout(() => {
+                    document.getElementById('loader-wrapper').classList.add('loaded');
+                }, 600);
+            }
+        }
+
+        function preloadImage(url) {
+            return new Promise((resolve) => {
+                if (!url) resolve();
+                const img = new Image();
+                img.src = url;
+                img.onload = resolve;
+                img.onerror = resolve;
+            });
+        }
+
+        function buildHref(link, val) {
+            if (!val || val === '#') return '#';
+
+            if (link.id === 'wa') {
+                if (val.startsWith('http')) return val;
+                return `https://wa.me/${val.replace(/[^0-9]/g, '')}`;
+            }
+
+            if (link.id === 'tg') {
+                if (val.startsWith('http')) return val;
+                if (val.startsWith('+') || /^\d/.test(val)) return `https://t.me/${val.replace(/[^0-9+]/g, '')}`;
+                return `https://t.me/${val.replace('@', '')}`;
+            }
+
+            if (link.id === 'tt') {
+                if (val.startsWith('http')) return val;
+                return `https://www.tiktok.com/@${val.replace('@', '')}`;
+            }
+
+            if (link.id === 'mail') {
+                if (val.startsWith('mailto:') || val.startsWith('http')) return val;
+                return `mailto:${val}`;
+            }
+
+            return val.startsWith('http') ? val : '#';
+        }
+
+        function recordClick(label, type) {
+            const device = /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop';
+            const clickData = { label, type, device, time: Date.now() };
+            db.collection('card_data').doc('analytics').get().then(doc => {
+                const existing = (doc.exists && doc.data().clicks) ? doc.data().clicks : [];
+                existing.push(clickData);
+                db.collection('card_data').doc('analytics').set({ clicks: existing });
+            }).catch(e => console.error("Analytics error:", e));
+        }
+
+        function listenToCardData() {
+            db.collection('card_data').doc('profile').onSnapshot(async (doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('displayName').textContent = data.name || 'Your Name';
+                    document.getElementById('displayBio').textContent = data.bio || '';
+
+                    const saveBtn = document.getElementById('saveBtn');
+                    saveBtn.textContent = data.save_text || 'Save Contact';
+                    if (data.phone) {
+                        saveBtn.href = `tel:${data.phone.replace(/\s/g, '')}`;
+                    }
+                    saveBtn.onclick = function() {
+                        recordClick('Save Contact', 'save_btn');
+                    };
+
+                    const imgPromises = [];
+                    if (data.profile_img) {
+                        imgPromises.push(preloadImage(data.profile_img).then(() => {
+                            document.getElementById('profilePic').innerHTML = `<img src="${data.profile_img}">`;
+                        }));
+                    }
+                    if (data.banner_img) {
+                        imgPromises.push(preloadImage(data.banner_img).then(() => {
+                            document.getElementById('bannerImage').style.backgroundImage = `url('${data.banner_img}')`;
+                        }));
+                    }
+                    if (data.bg) {
+                        imgPromises.push(preloadImage(data.bg).then(() => {
+                            document.body.style.backgroundImage = `url('${data.bg}')`;
+                        }));
+                    }
+
+                    await Promise.all(imgPromises);
+                    profileDone = true;
+
+                    // Stop dots animation, show Ready
+                    const msg = document.getElementById('load-msg');
+                    msg.classList.remove('dots-anim');
+                    msg.textContent = "Ready!";
+
+                    openDoors();
+                }
+            });
+
+            db.collection('card_data').doc('links').onSnapshot((doc) => {
+                const linksData = doc.exists ? doc.data() : {};
+                const grid = document.getElementById('iconGrid');
+                grid.innerHTML = '';
+
+                SOCIAL_LINKS.forEach(link => {
+                    const val = linksData[`link_${link.id}_url`] || linksData[`link_${link.id}_user`] || linksData[`link_${link.id}`];
+                    const status = linksData[`status_${link.id}`];
+
+                    if (status === true && val && val !== '#') {
+                        const item = document.createElement('a');
+                        item.className = 'icon-item';
+                        item.href = buildHref(link, val);
+                        item.target = '_blank';
+                        item.innerHTML = `
+                            <div class="icon-box ${link.bgClass}"><i class="${link.icon}"></i></div>
+                            <div class="icon-label">${link.label}</div>
+                        `;
+                        item.addEventListener('click', function() {
+                            recordClick(link.label, 'social_link');
+                        });
+                        grid.appendChild(item);
+                    }
+                });
+                linksDone = true;
+                openDoors();
+            });
+        }
+
+        window.addEventListener('load', listenToCardData);
+    </script>
+</body>
+</html>
